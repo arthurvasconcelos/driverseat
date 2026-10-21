@@ -25,6 +25,8 @@ function is_allowed {
     while IFS= read -r PATTERN; do
         PATTERN="${PATTERN#"${PATTERN%%[![:space:]]*}"}"
         PATTERN="${PATTERN%"${PATTERN##*[![:space:]]}"}"
+        # Unquoted on purpose: the pattern is a glob.
+        # shellcheck disable=SC2053
         if [[ "${PATTERN}" != "" && "${REL_PATH}" == ${PATTERN} ]]; then
             return 0
         fi

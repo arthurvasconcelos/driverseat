@@ -122,6 +122,8 @@ function test_state {
 }
 
 function main {
+    # Single quotes on purpose: the bash under test expands it.
+    # shellcheck disable=SC2016
     echo "Running with $("${TEST_BASH}" -c 'echo "bash ${BASH_VERSION}"')"
     test_guard
     test_delegation
