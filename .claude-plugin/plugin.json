@@ -1,0 +1,28 @@
+{
+  "name": "pair",
+  "displayName": "driverseat",
+  "version": "0.1.0",
+  "description": "You drive. Claude navigates. A pairing mode for Claude Code where you write the code and Claude scouts, critiques, hints and writes tests.",
+  "author": {
+    "name": "Arthur Vasconcelos",
+    "url": "https://github.com/arthurvasconcelos"
+  },
+  "homepage": "https://github.com/arthurvasconcelos/driverseat",
+  "repository": "https://github.com/arthurvasconcelos/driverseat",
+  "license": "MIT",
+  "keywords": ["pairing", "pair-programming", "navigator", "tdd", "learning"],
+  "userConfig": {
+    "enforce_edits": {
+      "type": "boolean",
+      "title": "Block source edits while pairing",
+      "description": "While /pair:start is active, block Claude from editing files in the project unless they match the allowed paths.",
+      "default": true
+    },
+    "allowed_paths": {
+      "type": "string",
+      "title": "Paths Claude may edit while pairing",
+      "description": "Comma-separated bash globs, relative to the project root. * also matches across directories.",
+      "default": "*.test.*,*.spec.*,*_test.*,test_*,*Test.java,*Tests.java,*IT.java,test/*,tests/*,*/test/*,*/tests/*,*/__tests__/*,*/e2e/*"
+    }
+  }
+}
