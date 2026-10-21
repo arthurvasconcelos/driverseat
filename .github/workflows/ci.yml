@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Lint scripts
-        run: shellcheck scripts/*.sh tests/*.sh .github/scripts/*.sh
+        run: shellcheck scripts/*.sh tests/*.sh .github/scripts/*.sh .githooks/commit-msg
 
   test:
     name: Script tests (${{ matrix.name }})

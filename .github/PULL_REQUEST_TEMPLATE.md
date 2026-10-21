@@ -18,6 +18,7 @@
 - [ ] Prompt changes were tried in a real session with `claude --plugin-dir`. Describe what you checked below.
 - [ ] If the stance changed: `output-styles/pairing.md` and the summary in `skills/start/SKILL.md` still match
 - [ ] `CHANGELOG.md` has an entry under Unreleased
+- [ ] The title and commit messages follow the format in `CONTRIBUTING.md`
 
 ## How you tested it
 

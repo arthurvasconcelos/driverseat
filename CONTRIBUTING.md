@@ -28,6 +28,7 @@ Restart the session after changing the output style. Skills are re-read when inv
 | `scripts/` | Hook and state scripts |
 | `tests/scripts.test.sh` | Tests for the scripts |
 | `assets/` | The icon. Edit `icon.svg`, then export `icon.png` at 1024 px |
+| `.githooks/` | Optional local git hooks, see [Commit messages](#commit-messages) |
 
 ## Changing prompts
 
@@ -52,6 +53,27 @@ TEST_BASH=/bin/bash tests/scripts.test.sh   # macOS bash 3.2
 The scripts must work on bash 3.2, because that's what macOS ships with. That rules out things like `${VAR,,}`, associative arrays and `mapfile`. CI runs the tests on Linux and on macOS bash 3.2, and ShellCheck on all scripts.
 
 Style: 4-space indent, `function name { ... }`, `[[ ]]`, upper-case variable names, `${VAR}` braces, and `>&2 echo` for errors.
+
+## Commit messages
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/), plus a `release` type:
+
+```
+type(scope)!: subject
+
+Optional body.
+```
+
+- Type is one of `feat`, `fix`, `docs`, `ci`, `chore`, `release`, `refactor`, `test`, `perf`, `build` or `revert`. The scope and `!` are optional.
+- The subject has at most 72 characters and no trailing period.
+- The body is optional. It comes after a blank line and has at most 800 characters: say what changed and why, and put longer explanations in the pull request or an issue.
+- Pull request titles follow the same format, because the title becomes the merge commit's subject.
+
+CI checks the title and every commit in a pull request. To catch problems before you commit, turn on the hook once per clone:
+
+```sh
+git config core.hooksPath .githooks
+```
 
 ## Pull requests
 

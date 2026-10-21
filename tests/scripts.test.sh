@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Tests for the hook and state scripts.
+# Tests for the hook and state scripts, and the commit message checks.
 #
 # Usage: tests/scripts.test.sh
 # Set TEST_BASH to run the scripts with a specific bash, e.g. /bin/bash on macOS.
@@ -12,6 +12,8 @@ readonly ROOT
 readonly TEST_BASH="${TEST_BASH:-bash}"
 readonly GUARD="${ROOT}/scripts/guard-edits.sh"
 readonly STATE="${ROOT}/scripts/pairing-state.sh"
+readonly MESSAGE_CHECK="${ROOT}/.github/scripts/check-commit-message.sh"
+readonly COMMITS_CHECK="${ROOT}/.github/scripts/check-commits.sh"
 
 PASSED=0
 FAILED=0
@@ -19,7 +21,8 @@ FAILED=0
 CLAUDE_PLUGIN_DATA="$(mktemp -d)"
 export CLAUDE_PLUGIN_DATA
 export CLAUDE_PROJECT_DIR="/proj"
-trap 'rm -rf "${CLAUDE_PLUGIN_DATA}"' EXIT
+TEST_REPO="$(mktemp -d)"
+trap 'rm -rf "${CLAUDE_PLUGIN_DATA}" "${TEST_REPO}"' EXIT
 
 function state {
     "${TEST_BASH}" "${STATE}" "$@" 2>&1
@@ -121,6 +124,69 @@ function test_state {
     check "unknown action rejected" "Usage" "$(state foo S1)"
 }
 
+function message_result {
+    local OUTPUT
+    if OUTPUT="$("${TEST_BASH}" "${MESSAGE_CHECK}" "$@" 2>&1)"; then
+        echo "ACCEPTED"
+    else
+        echo "REJECTED: ${OUTPUT}"
+    fi
+}
+
+function repeat {
+    head -c "${2}" < /dev/zero | tr '\0' "${1}"
+}
+
+function test_commit_message {
+    check "plain type accepted" "ACCEPTED" "$(message_result <<< "feat: add the hint ladder")"
+    check "scope and breaking marker accepted" "ACCEPTED" "$(message_result <<< "fix(hook)!: deny notebook edits")"
+    check "release merge subject accepted" "ACCEPTED" "$(message_result <<< "release: pair 0.1.0 (#1)")"
+    check "short body accepted" "ACCEPTED" "$(message_result <<< $'docs: explain delegation\n\nWhat and why, briefly.')"
+    check "leading blank lines ignored" "ACCEPTED" "$(message_result <<< $'\n\nci: run tests on macOS')"
+    check "comments and scissors ignored" "ACCEPTED" \
+        "$(message_result <<< $'chore: tidy\n# Please enter the commit message\n# ------------------------ >8 ------------------------\ndiff --git a/x b/x')"
+    check "message from a file" "ACCEPTED" "$(echo "test: cover the guard" > "${TEST_REPO}/msg" && message_result "${TEST_REPO}/msg")"
+
+    check "missing type rejected" "type one of" "$(message_result <<< "Update the README")"
+    check "unknown type rejected" "type one of" "$(message_result <<< "feature: add x")"
+    check "capitalised type rejected" "type one of" "$(message_result <<< "Feat: add x")"
+    check "missing space rejected" "type one of" "$(message_result <<< "feat:add x")"
+    check "empty subject rejected" "type one of" "$(message_result <<< "feat: ")"
+    check "empty message rejected" "type one of" "$(message_result <<< "")"
+    check "long subject rejected" "73 characters" "$(message_result <<< "feat: $(repeat a 67)")"
+    check "trailing period rejected" "period" "$(message_result <<< "fix: handle empty ids.")"
+    check "body without blank line rejected" "blank line" "$(message_result <<< $'feat: add x\nmore text')"
+    check "long body rejected" "801 characters" "$(message_result <<< $'feat: add x\n\n'"$(repeat b 801)")"
+
+    check "format-only allows a long body" "ACCEPTED" \
+        "$(message_result --format-only <<< $'ci(deps): bump actions/checkout from 7 to 8\n\n'"$(repeat c 2000)")"
+    check "format-only still needs a type" "type one of" "$(message_result --format-only <<< "Bump actions/checkout from 7 to 8")"
+}
+
+function test_commits {
+    local -a GIT=(git -C "${TEST_REPO}" -c user.name=Test -c user.email=test@example.com -c commit.gpgsign=false)
+    "${GIT[@]}" init -q
+    "${GIT[@]}" commit -q --allow-empty -m "chore: initial commit"
+    local BASE
+    BASE="$("${GIT[@]}" rev-parse HEAD)"
+    "${GIT[@]}" commit -q --allow-empty -m "feat: add x"
+    "${GIT[@]}" commit -q --allow-empty -m "ci(deps): bump x from 1 to 2" -m "$(repeat d 2000)" \
+        --author="dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>"
+
+    check "good range passes" "follow the format" \
+        "$(cd "${TEST_REPO}" && "${TEST_BASH}" "${COMMITS_CHECK}" "${BASE}" HEAD 2>&1)"
+
+    "${GIT[@]}" commit -q --allow-empty -m "wip"
+    local OUTPUT
+    OUTPUT="$(cd "${TEST_REPO}" && "${TEST_BASH}" "${COMMITS_CHECK}" "${BASE}" HEAD 2>&1; echo "exit=$?")"
+    check "bad commit named" "wip" "${OUTPUT}"
+    check "bad commit fails the range" "exit=1" "${OUTPUT}"
+    check "unknown base fails" "exit=1" \
+        "$(cd "${TEST_REPO}" && "${TEST_BASH}" "${COMMITS_CHECK}" no-such-ref HEAD > /dev/null 2>&1; echo "exit=$?")"
+    check "new branch checks only the head" "exit=1" \
+        "$(cd "${TEST_REPO}" && "${TEST_BASH}" "${COMMITS_CHECK}" 0000000000000000000000000000000000000000 HEAD > /dev/null 2>&1; echo "exit=$?")"
+}
+
 function main {
     # Single quotes on purpose: the bash under test expands it.
     # shellcheck disable=SC2016
@@ -128,6 +194,8 @@ function main {
     test_guard
     test_delegation
     test_state
+    test_commit_message
+    test_commits
     echo
     echo "${PASSED} passed, ${FAILED} failed"
     [[ "${FAILED}" -eq 0 ]]
