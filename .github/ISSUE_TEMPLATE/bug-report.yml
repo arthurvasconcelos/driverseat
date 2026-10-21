@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in the plugin is broken, e.g. the hook doesn't block, a command fails, or install doesn't work.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Include error messages if there were any.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. /pair:start
+        2. Ask Claude to edit src/app.ts
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `claude --version`, the plugin version from `/plugin`, and `bash --version | head -1`.
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows (WSL)
+        - Other
+    validations:
+      required: true

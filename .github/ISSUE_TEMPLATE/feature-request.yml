@@ -1,0 +1,25 @@
+name: Feature request
+description: An idea for a new command, setting or behaviour.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Check the Wishlist in the README first, since your idea may already be planned.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does it solve?
+      description: Describe the pairing situation where you missed it.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: driver
+    attributes:
+      label: Does it keep the driver in the driver's seat?
+      description: This plugin exists so the human does the thinking. How does the idea fit that?

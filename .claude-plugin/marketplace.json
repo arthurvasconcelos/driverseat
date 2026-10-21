@@ -1,0 +1,15 @@
+{
+  "name": "driverseat",
+  "owner": {
+    "name": "Arthur Vasconcelos",
+    "url": "https://github.com/arthurvasconcelos"
+  },
+  "description": "Pairing plugins for Claude Code where the human drives and Claude navigates.",
+  "plugins": [
+    {
+      "name": "pair",
+      "source": "./",
+      "description": "You drive. Claude navigates. A pairing mode for Claude Code where you write the code."
+    }
+  ]
+}
