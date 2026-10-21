@@ -57,6 +57,7 @@ Style: 4-space indent, `function name { ... }`, `[[ ]]`, upper-case variable nam
 
 - Branch from `develop` and open your pull request against `develop`. `main` only receives releases, and CI rejects pull requests into `main` from anywhere else.
 - Keep each pull request to one change.
+- Sign your commits ([how](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits)). `develop` and `main` only accept verified commits.
 - Add a line to `CHANGELOG.md` under **Unreleased**.
 - Don't change `version` in `plugin.json`. That happens at release time.
 
