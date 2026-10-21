@@ -6,7 +6,7 @@
 
 A pairing mode for [Claude Code](https://code.claude.com). You write the code. Claude scouts the codebase, critiques your plan, gives hints instead of answers, and writes failing tests for you to make pass.
 
-> Status: early work in progress (v0.1). Not yet tested in real sessions.
+> Status: early (v0.1). Feedback and [issues](https://github.com/arthurvasconcelos/driverseat/issues) are welcome.
 
 ## Why
 
