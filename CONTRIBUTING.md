@@ -65,9 +65,10 @@ Style: 4-space indent, `function name { ... }`, `[[ ]]`, upper-case variable nam
 
 Maintainers only. `main` is what users install, so it only moves on a release.
 
-1. On `develop`, set the new `version` in `.claude-plugin/plugin.json`, and move the **Unreleased** entries in `CHANGELOG.md` under `## [<version>] - YYYY-MM-DD`.
-2. Open a pull request from `develop` into `main`. CI checks that it comes from `develop`, that the version is new, and that the changelog has a dated entry for it.
-3. Merge it with a merge commit, not a squash, so `develop` and `main` keep a shared history.
-4. The Release workflow then runs CI again, creates the `pair--v<version>` tag, and publishes a GitHub Release with that changelog section.
+1. When a release is getting close, open a draft pull request from `develop` into `main` titled `release: pair <version>`, with the `release` label. It follows `develop` as work lands, so it always shows what the release will contain. Its release check fails until step 2, which is expected.
+2. On `develop`, set the new `version` in `.claude-plugin/plugin.json`, and move the **Unreleased** entries in `CHANGELOG.md` under `## [<version>] - YYYY-MM-DD`.
+3. Mark the pull request ready for review. CI checks that it comes from `develop`, that the version is new, and that the changelog has a dated entry for it.
+4. Merge it with a merge commit, not a squash, so `develop` and `main` keep a shared history.
+5. The Release workflow then runs CI again, creates the `pair--v<version>` tag, and publishes a GitHub Release with that changelog section.
 
 Users who update get the new version as soon as it's on `main`. See the README for how they update.
