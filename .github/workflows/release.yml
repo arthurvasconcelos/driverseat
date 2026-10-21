@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+concurrency: release
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  release:
+    name: Tag and publish release notes
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Read version
+        id: version
+        run: |
+          VERSION="$(jq -r .version .claude-plugin/plugin.json)"
+          TAG="pair--v${VERSION}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" > /dev/null; then
+              echo "::notice::${TAG} already exists, nothing to release."
+              echo "released=true" >> "${GITHUB_OUTPUT}"
+          else
+              echo "released=false" >> "${GITHUB_OUTPUT}"
+          fi
+      - name: Write release notes
+        if: steps.version.outputs.released == 'false'
+        run: .github/scripts/changelog-section.sh "${{ steps.version.outputs.version }}" > "${RUNNER_TEMP}/notes.md"
+      - name: Create tag and GitHub Release
+        if: steps.version.outputs.released == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+              --target "${GITHUB_SHA}" \
+              --title "pair ${{ steps.version.outputs.version }}" \
+              --notes-file "${RUNNER_TEMP}/notes.md"

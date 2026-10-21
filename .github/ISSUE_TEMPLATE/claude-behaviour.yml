@@ -1,0 +1,48 @@
+name: Claude behaviour
+description: Claude didn't act like a navigator, e.g. it solved instead of hinting, ignored a command, or was too chatty.
+labels: [prompt]
+body:
+  - type: markdown
+    attributes:
+      value: Most issues with this plugin are about how Claude behaves. A short excerpt of the conversation helps more than anything else. Remove anything private from it first.
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options:
+        - Pairing output style
+        - /pair:start
+        - /pair:stop
+        - /pair:hint
+        - /pair:critique
+        - /pair:tdd
+        - /pair:delegate
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What Claude did
+      description: Paste the relevant part of the conversation.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Output of `claude --version`, and the plugin version from `/plugin`.
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: Which model the session used, if you know.
