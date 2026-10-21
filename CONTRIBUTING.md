@@ -27,6 +27,7 @@ Restart the session after changing the output style. Skills are re-read when inv
 | `hooks/hooks.json` | The edit guard and the session-end cleanup |
 | `scripts/` | Hook and state scripts |
 | `tests/scripts.test.sh` | Tests for the scripts |
+| `assets/` | The icon. Edit `icon.svg`, then export `icon.png` at 1024 px |
 
 ## Changing prompts
 

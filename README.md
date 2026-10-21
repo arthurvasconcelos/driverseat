@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/icon.svg" alt="" width="120"></p>
+
 # driverseat
 
 **You drive. Claude navigates.**

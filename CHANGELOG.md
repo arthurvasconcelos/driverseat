@@ -16,3 +16,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - `/pair:delegate`: hands specific files or folders to Claude while pairing stays on.
 - Edit guard hook that blocks Claude from editing project files other than tests while pairing is on.
 - `enforce_edits` and `allowed_paths` settings.
+- Plugin icon.
